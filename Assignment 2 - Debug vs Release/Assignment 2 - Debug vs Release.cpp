@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 
 #define MAX_NAME_SIZE 50
+#define PRERELEASE
 
 #include <iostream>
 #include <fstream>
@@ -12,8 +13,32 @@ typedef struct STUDENT_DATA {
 
     char* firstName;
     char* lastName;
+#ifdef PRERELEASE
+    char* email;
+#endif
 
 } DATA, *PDATA;
+
+#ifdef PRERELEASE
+
+PDATA createStudentDataRecord(char* first, char* last, char* email) {
+
+    PDATA studentRecordPtr = (PDATA)malloc(sizeof(DATA));
+
+    studentRecordPtr->firstName = new char[MAX_NAME_SIZE];
+    strcpy(studentRecordPtr->firstName, first);
+
+    studentRecordPtr->lastName = new char[MAX_NAME_SIZE];
+    strcpy(studentRecordPtr->lastName, last);
+
+    studentRecordPtr->email = new char[MAX_NAME_SIZE];
+    strcpy(studentRecordPtr->email, email);
+
+    return studentRecordPtr;
+
+}
+
+#endif
 
 PDATA createStudentDataRecord(char* first, char* last) {
 
@@ -31,15 +56,31 @@ PDATA createStudentDataRecord(char* first, char* last) {
 
 void printStudentDataRecord(PDATA record) {
 
-    cout << record->firstName << " " << record->lastName << endl;
+    cout << "Name: " << record->firstName << " " << record->lastName << endl;
+
+#ifdef PRERELEASE
+    cout << "Email: " << record->email << endl;
+#endif
 
 }
 
 int main() {
 
+#ifdef PRERELEASE
+    cout << "Running the program in Pre-release mode." << endl;
+#else
+    cout << "Running the program in standard mode."
+#endif
+
     string fileLine;
     string fileDelimiter = ",";
+
+#ifdef PRERELEASE
+    ifstream studentDataFile("StudentData_Emails.txt", ios::in);
+#else
     ifstream studentDataFile("StudentData.txt", ios::in);
+#endif
+
     vector<PDATA> studentDataVector;
 
     if (studentDataFile.is_open()) {
@@ -52,13 +93,25 @@ int main() {
             string token = fileLine.substr(0, pos);
             char* tempLastName = new char[token.length() + 1];
             strcpy(tempLastName, token.c_str());
-                
-            fileLine.erase(0, pos + fileDelimiter.length()); //fileLine now only contains the last name.
-            char* tempFirstName = new char[fileLine.length() + 1];
-            strcpy(tempFirstName, fileLine.c_str());
-            //Create a struct with the parsed first name and last name.
             
+            fileLine.erase(0, pos + fileDelimiter.length()); //fileLine now only contains the last name.
+            pos = fileLine.find(fileDelimiter);
+            token = fileLine.substr(0, pos);
+            char* tempFirstName = new char[token.length() + 1];
+            strcpy(tempFirstName, token.c_str());
+
+#ifdef PRERELEASE
+            fileLine.erase(0, pos + fileDelimiter.length()); //fileLine now only contains the last name.
+            char* tempEmail = new char[fileLine.length() + 1];
+            strcpy(tempEmail, fileLine.c_str());
+#endif
+
+            //Create a struct with the parsed first name and last name.
+#ifdef PRERELEASE
+            PDATA tempStudentDataPtr = createStudentDataRecord(tempFirstName, tempLastName, tempEmail);
+#else
             PDATA tempStudentDataPtr = createStudentDataRecord(tempFirstName, tempLastName);
+#endif
 
             //Push each STUDENT_DATA struct ptr to a vector of STUDENT_DATA struct ptrs.
             studentDataVector.push_back(tempStudentDataPtr);
@@ -74,8 +127,6 @@ int main() {
     }
 
     else cout << "Unable to open file." << endl;
-    
-    //Push each STUDENT_DATA struct to a vector of STUDENT_DATA structs.
 
     return 1;
 }
