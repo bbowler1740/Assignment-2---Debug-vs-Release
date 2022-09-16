@@ -62,7 +62,12 @@ int main() {
 
             //Push each STUDENT_DATA struct ptr to a vector of STUDENT_DATA struct ptrs.
             studentDataVector.push_back(tempStudentDataPtr);
+            
+#ifdef _DEBUG
+
             printStudentDataRecord(tempStudentDataPtr);
+
+#endif
             
         }
 
