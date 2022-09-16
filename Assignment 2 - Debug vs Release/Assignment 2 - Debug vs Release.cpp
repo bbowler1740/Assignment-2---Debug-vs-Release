@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 
 #define MAX_NAME_SIZE 50
-#define PRERELEASE
+//#define PRERELEASE
 
 #include <iostream>
 #include <fstream>
@@ -69,7 +69,7 @@ int main() {
 #ifdef PRERELEASE
     cout << "Running the program in Pre-release mode." << endl;
 #else
-    cout << "Running the program in standard mode."
+    cout << "Running the program in standard mode.";
 #endif
 
     string fileLine;
